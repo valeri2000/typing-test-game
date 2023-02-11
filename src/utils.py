@@ -23,5 +23,13 @@ def text_with_fixed_column_size(text: list, lim_column: int) -> list:
         else:
             curr_line += word + ' '
             curr_column += len(word) + 1
+    curr_line = curr_line[:-1]
     res_text.append(curr_line)
     return res_text
+
+
+def total_characters_in_text(text: list) -> int:
+    res = 0
+    for word in text:
+        res += len(word)
+    return res
