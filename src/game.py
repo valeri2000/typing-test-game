@@ -13,3 +13,6 @@ class Game:
 
     def new_text(self):
         self._text = generate_fixed_length_text(self._text_length)
+
+    def update_text_length(self, text_length: int):
+        self._text_length = text_length

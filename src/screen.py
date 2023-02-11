@@ -64,8 +64,10 @@ class Screen:
             box2.addstr('New singleplayer game (press s)\n')
             box2.addstr('New multiplayer game (press m)\n')
             box2.addstr('Show statistics (press t)\n')
+            box2.addstr('Settings (press o)\n')
             box2.addstr('Clear ALL player info (press c)\n')
             box2.addstr('Exit (press e)\n')
+            box2.addstr('\n\nIn order to go back from a menu, press ESC')
             self._screen.refresh()
             time.sleep(0.01)
             char = self._screen.getch()
@@ -76,6 +78,8 @@ class Screen:
                 break
             elif char == ord('t'):
                 self._stats_window()
+            elif char == ord('o'):
+                self._settings_window()
             elif char == ord('c'):
                 self._game.player.clear_player_stats()
                 break
@@ -95,7 +99,7 @@ class Screen:
             box2.clear()
             box2.addstr('Text finished in ' +
                         str(time_taken_secs) + ' seconds!\n')
-            box2.addstr('WPM: ' + str(wpm) + '\n')
+            box2.addstr('WPM: ' + "{:.2f}".format(wpm) + '\n')
             box2.addstr('Mistakes: ' + str(mistakes) + '\n')
             box2.addstr(
                 'Accuracy: ' + "{:.2f}".format((num_symbols - mistakes) / num_symbols * 100) + '%\n')
@@ -144,6 +148,7 @@ class Screen:
                         box2.addstr(transformed_text[row][curr_pos_col:])
                 else:
                     box2.addstr(transformed_text[row])
+                box2.addstr('\n')
             self._screen.refresh()
             time.sleep(0.01)
             char = self._screen.getch()
@@ -187,11 +192,51 @@ class Screen:
             box2 = self._screen.subwin(18, 78, 7, 51)
             box1.box()
             box2.clear()
-            box2.addstr('TODO')
+            box2.addstr('Player name: ' + self._game.player.name() + '\n')
+            box2.addstr('Average WPM: ' +
+                        "{:.2f}".format(self._game.player.average_wpm()) + '\n')
+            box2.addstr('Total texts completed: ' +
+                        str(self._game.player.total_number_of_races()) + '\n')
+            box2.addstr('Last ten results: ' +
+                        str(self._game.player.last_ten_races()) + '\n')
+            box2.addstr('\n\nIn order to go back, press ESC')
             self._screen.refresh()
             time.sleep(0.01)
             char = self._screen.getch()
             if char == 27:  # escape code
                 break
 
+        curses.endwin()
+
+    def _settings_window(self):
+        while True:
+            box1 = self._screen.subwin(20, 80, 6, 50)
+            box2 = self._screen.subwin(18, 78, 7, 51)
+            box1.box()
+            box2.clear()
+            box2.addstr('Update the number of words in a text:\n')
+            box2.addstr('\t10 (press 1)\n')
+            box2.addstr('\t30 (press 2)\n')
+            box2.addstr('\t60 (press 3)\n')
+            box2.addstr('\t100 (press 4)\n')
+            box2.addstr('\n\nIn order to go back, press ESC')
+            self._screen.refresh()
+            time.sleep(0.01)
+            char = self._screen.getch()
+            if char == 27:  # escape code
+                break
+            elif char == ord('1'):
+                self._game.update_text_length(10)
+                break
+            elif char == ord('2'):
+                self._game.update_text_length(30)
+                break
+            elif char == ord('3'):
+                self._game.update_text_length(60)
+                break
+            elif char == ord('4'):
+                self._game.update_text_length(100)
+                break
+
+        self._game.new_text()
         curses.endwin()
