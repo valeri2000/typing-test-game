@@ -1,6 +1,7 @@
 import curses
 import curses.panel
 import time
+from client import Client
 from game import Game
 from utils import text_with_fixed_column_size, total_characters_in_text
 
@@ -72,9 +73,10 @@ class Screen:
             time.sleep(0.01)
             char = self._screen.getch()
             if char == ord('s'):
-                self._single_player_window()
+                self._game_window(0)
                 break
             elif char == ord('m'):
+                self._multi_player_window()
                 break
             elif char == ord('t'):
                 self._stats_window()
@@ -113,9 +115,21 @@ class Screen:
         self._game.new_text()
         self._start_window()
 
-    def _single_player_window(self):
+    def _multi_player_window(self):
+        self._client = Client()
+        if self._client.join_lobby():
+            txt = self._client.receive_text()
+            self._game.set_text(txt)
+            self._multi_player_countdown()
+            if self._client.receive_msg() == 'start':
+                self._game_window(1)
+
+    def _game_window(self, is_multi: bool):
         transformed_text = text_with_fixed_column_size(self._game.text(), 76)
         track_time, start_time, end_time = False, 0, 0
+        if is_multi:
+            track_time = True
+            start_time = int(time.time())
         curr_pos_row, curr_pos_col = 0, 0
         last_char_wrong = False
         mistakes = 0
@@ -178,13 +192,17 @@ class Screen:
                     curr_pos_col = 0
                 if curr_pos_row == len(transformed_text) and not last_char_wrong:
                     end_time = int(time.time())
+                    if is_multi:
+                        self._client.send_msg(str(time.time()))
+                        break
                     self._game_end_window(end_time - start_time, mistakes, len(
                         self._game.text()), total_characters_in_text(transformed_text))
                     break
 
         curses.endwin()
         self._game.new_text()
-        self._start_window()
+        if not is_multi:
+            self._start_window()
 
     def _stats_window(self):
         while True:
@@ -239,4 +257,19 @@ class Screen:
                 break
 
         self._game.new_text()
+        curses.endwin()
+
+    def _multi_player_countdown(self):
+        time_left = 10
+        while True:
+            box1 = self._screen.subwin(20, 80, 6, 50)
+            box2 = self._screen.subwin(18, 78, 7, 51)
+            box1.box()
+            box2.clear()
+            box2.addstr('Race will begin in ' + str(time_left) + ' seconds!')
+            self._screen.refresh()
+            time.sleep(1)
+            time_left -= 1
+            if time_left == 0:
+                break
         curses.endwin()
