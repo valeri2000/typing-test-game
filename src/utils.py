@@ -9,8 +9,19 @@ def generate_fixed_length_text(lim_words: int) -> list:
         content = file.read()
         words = content.split(sep='\n')
         generated_text = random.sample(population=words, k=lim_words)
-        print(generated_text)
         return generated_text
 
 
-generate_fixed_length_text(10)
+def text_with_fixed_column_size(text: list, lim_column: int) -> list:
+    res_text = []
+    curr_column, curr_line = 0, ''
+    for word in text:
+        if len(word) + curr_column + 1 > lim_column:
+            res_text.append(curr_line)
+            curr_line = word + ' '
+            curr_column = len(word) + 1
+        else:
+            curr_line += word + ' '
+            curr_column += len(word) + 1
+    res_text.append(curr_line)
+    return res_text

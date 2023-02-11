@@ -7,8 +7,9 @@ This is a typing test game written in Python with multiplayer support.
 1. Create virtual environment and load it:
 
 ```
-λ python3 -m venv .
-λ source bin/activate
+λ mkdir venv
+λ python3 -m venv venv
+λ source venv/bin/activate
 λ pip install --upgrade pip
 ```
 
