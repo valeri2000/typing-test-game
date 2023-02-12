@@ -1,3 +1,6 @@
+"""File for Server class
+"""
+
 import socket
 import pickle
 from time import sleep
@@ -22,7 +25,7 @@ class Server:
         self._clients = []
         self._results = []
 
-    def _client_manager(self, c: socket.socket):
+    def _client_manager(self, sock: socket.socket):
         """Method which is run in new threads for managing multiple clients
 
         Args:
@@ -33,33 +36,33 @@ class Server:
         with self._clients_lock:
             if len(self._clients) == 2:
                 accept = '0'
-        c.send(accept.encode())
+        sock.send(accept.encode())
         if accept == '0':
-            c.close()
+            sock.close()
             return
-        player_name = c.recv(1024).decode()
+        player_name = sock.recv(1024).decode()
         with self._clients_lock:
-            self._clients.append((c, player_name))
+            self._clients.append((sock, player_name))
         with self._clients_lock:
             if len(self._clients) == 2:
                 txt = generate_fixed_length_text(10)
                 data = pickle.dumps(txt)
-                for (c, _) in self._clients:
-                    c.send(data)
+                for (curr_sock, _) in self._clients:
+                    curr_sock.send(data)
                 sleep(2)
-                for (c, name) in self._clients:
+                for (curr_sock, name) in self._clients:
                     if name != self._clients[0][1]:
-                        c.send(self._clients[0][1].encode())
+                        curr_sock.send(self._clients[0][1].encode())
                     else:
-                        c.send(self._clients[1][1].encode())
+                        curr_sock.send(self._clients[1][1].encode())
                 sleep(2)
-                for (c, _) in self._clients:
-                    c.send(b'start')
-        msg = c.recv(1024).decode()  # block
+                for (curr_sock, _) in self._clients:
+                    curr_sock.send(b'start')
+        msg = sock.recv(1024).decode()  # block
         if not msg:
             print('Client dead!')
             with self._clients_lock:
-                self._clients.remove((c, player_name))
+                self._clients.remove((sock, player_name))
         else:
             print('Got from client ' + str(msg))
             wpm = int(msg)
@@ -88,10 +91,10 @@ class Server:
         """
 
         while True:
-            c, addr = self._socket.accept()
+            sock, addr = self._socket.accept()
             print('Connected to: ' + addr[0] + ':' + str(addr[1]))
-            t = Thread(target=self._client_manager, args=(c, ))
-            t.start()
+            thread = Thread(target=self._client_manager, args=(sock, ))
+            thread.start()
 
 
 server = Server()

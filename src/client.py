@@ -1,3 +1,6 @@
+"""Module for client for the game which is needed for multiplayer mode
+"""
+
 import socket
 import pickle
 from config import SERVER_ADDRESS, SERVER_PORT
@@ -85,9 +88,15 @@ class Client:
 
         success = True
         try:
-            bytes = self._socket.send(msg.encode())
-            if bytes == 0:
+            cnt_bytes = self._socket.send(msg.encode())
+            if cnt_bytes == 0:
                 success = False
         except:
             success = False
         return success
+
+    def close_socket(self):
+        """Public method to close socket
+        """
+
+        self._socket.close()

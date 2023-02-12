@@ -1,3 +1,6 @@
+"""File for Player class
+"""
+
 import json
 import os
 
@@ -41,7 +44,7 @@ class Player:
 
         dir_path = os.path.dirname(os.path.realpath(__file__))
         try:
-            with open(dir_path+'/../'+stats_file_name, 'r') as file:
+            with open(dir_path+'/../'+stats_file_name, 'r', encoding='utf-8') as file:
                 player_stats = json.load(file)
 
             if 'name' not in player_stats or 'average_wpm' not in player_stats or \
@@ -49,7 +52,7 @@ class Player:
                 raise ValueError
         except (FileNotFoundError, ValueError):
             player_stats = self._clear_player_stats()
-            with open(dir_path+'/../'+stats_file_name, 'w+') as file:
+            with open(dir_path+'/../'+stats_file_name, 'w+', encoding='utf-8') as file:
                 json.dump(player_stats, file)
 
         return player_stats
@@ -103,7 +106,7 @@ class Player:
         """Public method for getting the last ten WPM results of a player
 
         Returns:
-            list: sequence of the last ten game results 
+            list: sequence of the last ten game results
         """
         return self._player_stats['last_ten_races']
 
@@ -127,7 +130,7 @@ class Player:
         """
 
         dir_path = os.path.dirname(os.path.realpath(__file__))
-        with open(dir_path+'/../'+self._stats_file_name, 'w') as file:
+        with open(dir_path+'/../'+self._stats_file_name, 'w', encoding='utf-8') as file:
             json.dump(self._player_stats, file)
 
     def clear_player_stats(self):

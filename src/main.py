@@ -1,3 +1,6 @@
+"""File for main file, main funciton
+"""
+
 from screen import Screen
 
 

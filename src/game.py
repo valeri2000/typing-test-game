@@ -1,3 +1,6 @@
+"""File for the Game class
+"""
+
 from player import Player
 from utils import generate_fixed_length_text
 from constants import DEFAULT_SINGLE_PLAYER_WORDS

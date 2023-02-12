@@ -1,3 +1,6 @@
+"""File for Screen class
+"""
+
 import curses
 import curses.panel
 import time
@@ -17,6 +20,7 @@ class Screen:
 
         self._game = Game()
         self._screen = curses.initscr()
+        self._client = None
         curses.cbreak()
         curses.noecho()
         curses.start_color()
@@ -42,7 +46,7 @@ class Screen:
         """
 
         new_name = ''
-        exit = False
+        should_exit = False
         while True:
             box1 = self._screen.subwin(20, 80, 6, 50)
             box2 = self._screen.subwin(18, 78, 7, 51)
@@ -55,15 +59,15 @@ class Screen:
             time.sleep(0.01)
             char = self._screen.getch()
             if char == ESCAPE_ORD_CODE:  # escape code
-                exit = True
+                should_exit = True
                 break
-            elif (char in (BACKSPACE_ORD_CODE_1, BACKSPACE_ORD_CODE_2)) and len(new_name) > 0:
+            if (char in (BACKSPACE_ORD_CODE_1, BACKSPACE_ORD_CODE_2)) and len(new_name) > 0:
                 new_name = new_name[:-1]
-            elif char == ENTER_ORD_CODE and len(new_name) > 0:
+            if char == ENTER_ORD_CODE and len(new_name) > 0:
                 break
-            elif (char >= ord('a') and char <= ord('z')) or (char >= ord('A') and char <= ord('Z')):
+            if (ord('a') <= char <= ord('z')) or (ord('A') <= char <= ord('Z')):
                 new_name += chr(char)
-        if not exit:
+        if not should_exit:
             self._game.player.set_name(new_name)
             self._start_window()
         curses.endwin()
@@ -91,22 +95,23 @@ class Screen:
             if char == ord('s'):
                 self._game_window(0)
                 break
-            elif char == ord('m'):
+            if char == ord('m'):
                 self._multi_player_window()
                 break
-            elif char == ord('t'):
+            if char == ord('t'):
                 self._stats_window()
-            elif char == ord('o'):
+            if char == ord('o'):
                 self._settings_window()
-            elif char == ord('c'):
+            if char == ord('c'):
                 self._game.player.clear_player_stats()
                 break
-            elif char == ord('e'):
+            if char == ord('e'):
                 break
 
         curses.endwin()
 
-    def _game_end_window(self, time_taken_secs: int, mistakes: int, num_words: int, num_symbols: int, is_multi: bool):
+    def _game_end_window(self, time_taken_secs: int, mistakes: int,
+                         num_words: int, num_symbols: int, is_multi: bool):
         """Game end window shown when player finishes their text
 
         Args:
@@ -133,12 +138,13 @@ class Screen:
             box2.addstr('WPM: ' + "{:.2f}".format(wpm) + '\n')
             box2.addstr('Mistakes: ' + str(mistakes) + '\n')
             box2.addstr(
-                'Accuracy: ' + "{:.2f}".format((num_symbols - mistakes) / num_symbols * 100) + '%\n')
+                'Accuracy: ' + "{:.2f}".format(
+                    (num_symbols - mistakes) / num_symbols * 100) + '%\n')
             if is_multi:
                 if multi_result == -1:
                     box2.addstr('Waiting for the other player to finish ..\n')
                     msg = self._client.receive_msg_no_block()
-                    if len(msg):
+                    if len(msg) > 0:
                         msg = msg.split(',')
                         multi_result = int(msg[0])
                         opponent_wpm = int(msg[1])
@@ -166,7 +172,7 @@ class Screen:
         self._client = Client()
         if self._client.join_lobby(self._game.player.name()):
             if not self._multi_player_lobby():
-                self._client._socket.close()
+                self._client.close_socket()
                 self._start_window()
                 return
             self._multi_player_countdown()
@@ -210,13 +216,16 @@ class Screen:
                 elif row == curr_pos_row:
                     if last_char_wrong:
                         box2.addstr(
-                            transformed_text[row][:curr_pos_col - 1], curses.color_pair(1) | curses.A_UNDERLINE)
+                            transformed_text[row][:curr_pos_col - 1],
+                            curses.color_pair(1) | curses.A_UNDERLINE)
                         box2.addstr(
-                            str(transformed_text[row][curr_pos_col - 1]), curses.color_pair(2) | curses.A_UNDERLINE)
+                            str(transformed_text[row][curr_pos_col - 1]),
+                            curses.color_pair(2) | curses.A_UNDERLINE)
                         box2.addstr(transformed_text[row][curr_pos_col:])
                     else:
                         box2.addstr(
-                            transformed_text[row][:curr_pos_col], curses.color_pair(1) | curses.A_UNDERLINE)
+                            transformed_text[row][:curr_pos_col],
+                            curses.color_pair(1) | curses.A_UNDERLINE)
                         box2.addstr(transformed_text[row][curr_pos_col:])
                 else:
                     box2.addstr(transformed_text[row])
@@ -226,7 +235,7 @@ class Screen:
             char = self._screen.getch()
             if char == ESCAPE_ORD_CODE:  # escape code
                 break
-            elif char in (BACKSPACE_ORD_CODE_1, BACKSPACE_ORD_CODE_2):  # backspace
+            if char in (BACKSPACE_ORD_CODE_1, BACKSPACE_ORD_CODE_2):  # backspace
                 if curr_pos_row == 0 and curr_pos_col == 0:
                     continue
                 if curr_pos_col == 0:
@@ -235,7 +244,7 @@ class Screen:
                 else:
                     curr_pos_col -= 1
                 last_char_wrong = False
-            elif (char >= ord('a') and char <= ord('z')) or char == ord(' '):
+            if (ord('a') <= char <= ord('z')) or char == ord(' '):
                 if not track_time:
                     track_time = True
                     start_time = int(time.time())
@@ -303,16 +312,16 @@ class Screen:
             char = self._screen.getch()
             if char == ESCAPE_ORD_CODE:  # escape code
                 break
-            elif char == ord('1'):
+            if char == ord('1'):
                 self._game.update_text_length(10)
                 break
-            elif char == ord('2'):
+            if char == ord('2'):
                 self._game.update_text_length(30)
                 break
-            elif char == ord('3'):
+            if char == ord('3'):
                 self._game.update_text_length(60)
                 break
-            elif char == ord('4'):
+            if char == ord('4'):
                 self._game.update_text_length(100)
                 break
 
@@ -333,7 +342,7 @@ class Screen:
             box2.clear()
             box2.addstr('Race will begin in ' +
                         str(time_left) + ' seconds!\n')
-            if len(opponent_name):
+            if len(opponent_name) > 0:
                 box2.addstr('Opponent is ' + opponent_name + '\n')
             self._screen.refresh()
             time.sleep(1)

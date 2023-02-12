@@ -1,3 +1,6 @@
+"""File with constants for different magic numbers
+"""
+
 ENTER_ORD_CODE = 10
 ESCAPE_ORD_CODE = 27
 BACKSPACE_ORD_CODE_1 = 8

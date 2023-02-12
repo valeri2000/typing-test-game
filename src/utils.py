@@ -1,3 +1,6 @@
+"""File containing different utility functions
+"""
+
 import os
 import random
 from constants import WORDS_PATH
@@ -15,7 +18,7 @@ def generate_fixed_length_text(lim_words: int) -> list:
 
     dir_path = os.path.dirname(os.path.realpath(__file__))
     file_path = dir_path + WORDS_PATH
-    with open(file_path, "r") as file:
+    with open(file_path, "r", encoding='utf-8') as file:
         content = file.read()
         words = content.split(sep='\n')
         generated_text = random.sample(population=words, k=lim_words)
