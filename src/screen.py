@@ -92,9 +92,11 @@ class Screen:
 
     def _game_end_window(self, time_taken_secs: int, mistakes: int, num_words: int, num_symbols: int, is_multi: bool):
         wpm = num_words / time_taken_secs * 60
+        if is_multi:
+            self._client.send_msg(str(int(wpm)))
         self._game.player.add_result(int(wpm))
         self._game.player.save_player_stats()
-        multi_result = -1
+        multi_result, opponent_wpm = -1, 0
         while True:
             box1 = self._screen.subwin(20, 80, 6, 50)
             box2 = self._screen.subwin(18, 78, 7, 51)
@@ -108,11 +110,18 @@ class Screen:
                 'Accuracy: ' + "{:.2f}".format((num_symbols - mistakes) / num_symbols * 100) + '%\n')
             if is_multi:
                 if multi_result == -1:
-                    multi_result = int(self._client.receive_msg())
-                if multi_result == 1:
-                    box2.addstr('You won!\n')
+                    box2.addstr('Waiting for the other player to finish ..\n')
+                    msg = self._client.receive_msg_no_block()
+                    if len(msg):
+                        msg = msg.split(',')
+                        multi_result = int(msg[0])
+                        opponent_wpm = int(msg[1])
+                elif multi_result == 1:
+                    box2.addstr('You won! Opponent wpm: ' +
+                                str(opponent_wpm) + '\n')
                 else:
-                    box2.addstr('You lost!\n')
+                    box2.addstr('You lost! Opponent wpm: ' +
+                                str(opponent_wpm) + '\n')
             box2.addstr('\n\nIn order to go back, press ESC')
             self._screen.refresh()
             time.sleep(0.01)
@@ -206,8 +215,6 @@ class Screen:
                     curr_pos_col = 0
                 if curr_pos_row == len(transformed_text) and not last_char_wrong:
                     end_time = int(time.time())
-                    if is_multi:
-                        self._client.send_msg(str(end_time))
                     self._game_end_window(end_time - start_time, mistakes, len(
                         self._game.text()), total_characters_in_text(transformed_text), is_multi)
                     break

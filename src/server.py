@@ -50,16 +50,23 @@ class Server:
                 self._clients.remove((c, player_name))
         else:
             print('Got from client ' + str(msg))
-            msg = str(time())
+            wpm = int(msg)
             with self._results_lock:
-                self._results.append((player_name, msg))
+                self._results.append((player_name, wpm))
         with self._results_lock:
             if len(self._results) == 2:
-                # result[0][0] < results[0][1]
                 with self._clients_lock:
-                    flag = self._clients[0][1] == self._results[0][0]
-                    self._clients[0][0].send(str(int(flag)).encode())
-                    self._clients[1][0].send(str(int(flag ^ 1)).encode())
+                    if self._clients[0][1] == self._results[0][0]:
+                        self._clients[0][0].send(
+                            ('1,'+str(self._results[1][1])).encode())
+                        self._clients[1][0].send(
+                            ('0,'+str(self._results[0][1])).encode())
+                    else:
+                        self._clients[0][0].send(
+                            ('0,'+str(self._results[0][1])).encode())
+                        self._clients[1][0].send(
+                            ('1,'+str(self._results[1][1])).encode())
+
                 self._results.clear()
                 with self._clients_lock:
                     self._clients.clear()

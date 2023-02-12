@@ -31,6 +31,15 @@ class Client:
         received_data = self._socket.recv(1024).decode()
         return str(received_data)
 
+    def receive_msg_no_block(self) -> str:
+        received_data = ''
+        try:
+            received_data = self._socket.recv(
+                1024, socket.MSG_DONTWAIT).decode()
+        except:
+            pass
+        return str(received_data)
+
     def send_msg(self, msg: str) -> bool:
         success = True
         try:
