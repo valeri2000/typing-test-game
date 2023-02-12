@@ -8,7 +8,13 @@ from constants import ESCAPE_ORD_CODE, BACKSPACE_ORD_CODE_1, BACKSPACE_ORD_CODE_
 
 
 class Screen:
+    """Class for the screen responsible for drawing the game and handling keys
+    """
+
     def __init__(self):
+        """Constructor for Screen class
+        """
+
         self._game = Game()
         self._screen = curses.initscr()
         curses.cbreak()
@@ -21,6 +27,9 @@ class Screen:
         curses.curs_set(False)
 
     def start(self):
+        """The only public method which loads the game
+        """
+
         if self._game.player.is_new_player():
             self._register_window()
         else:
@@ -29,6 +38,9 @@ class Screen:
         self._game.player.save_player_stats()
 
     def _register_window(self):
+        """Register window shown when local storage file is unavailable
+        """
+
         new_name = ''
         exit = False
         while True:
@@ -57,6 +69,9 @@ class Screen:
         curses.endwin()
 
     def _start_window(self):
+        """Start window which shows the main menu of the game
+        """
+
         player_name = self._game.player.name()
         while True:
             box1 = self._screen.subwin(20, 80, 6, 50)
@@ -92,6 +107,16 @@ class Screen:
         curses.endwin()
 
     def _game_end_window(self, time_taken_secs: int, mistakes: int, num_words: int, num_symbols: int, is_multi: bool):
+        """Game end window shown when player finishes their text
+
+        Args:
+            time_taken_secs (int): time taken for the whole text
+            mistakes (int): number of wrongly typed symbols
+            num_words (int): number of words in the text
+            num_symbols (int): number of symbols in the text
+            is_multi (bool): is the game multiplayer one
+        """
+
         wpm = num_words / time_taken_secs * 60
         if is_multi:
             self._client.send_msg(str(int(wpm)))
@@ -135,6 +160,9 @@ class Screen:
         self._start_window()
 
     def _multi_player_window(self):
+        """Multi player window which handles the event of choosing multiplayer mode
+        """
+
         self._client = Client()
         if self._client.join_lobby(self._game.player.name()):
             if not self._multi_player_lobby():
@@ -149,6 +177,12 @@ class Screen:
             self._start_window()
 
     def _game_window(self, is_multi: bool):
+        """Main game window which shows the text and tracks the player input
+
+        Args:
+            is_multi (bool): is current game multiplayer one
+        """
+
         transformed_text = text_with_fixed_column_size(self._game.text(), 76)
         track_time, start_time, end_time = False, 0, 0
         if is_multi:
@@ -225,6 +259,9 @@ class Screen:
         self._start_window()
 
     def _stats_window(self):
+        """Window which shows player statistics from previous runs
+        """
+
         while True:
             box1 = self._screen.subwin(20, 80, 6, 50)
             box2 = self._screen.subwin(18, 78, 7, 51)
@@ -247,6 +284,9 @@ class Screen:
         curses.endwin()
 
     def _settings_window(self):
+        """Window which presents some settings to the player regarding the game
+        """
+
         while True:
             box1 = self._screen.subwin(20, 80, 6, 50)
             box2 = self._screen.subwin(18, 78, 7, 51)
@@ -280,6 +320,9 @@ class Screen:
         curses.endwin()
 
     def _multi_player_countdown(self):
+        """Window when multiplayer match is to begin with timer
+        """
+
         time_left = 10
         init = False
         opponent_name = ''
@@ -303,6 +346,9 @@ class Screen:
         curses.endwin()
 
     def _multi_player_wait(self):
+        """Window shown when server is busy (2 players are already in a match)
+        """
+
         while True:
             box1 = self._screen.subwin(20, 80, 6, 50)
             box2 = self._screen.subwin(18, 78, 7, 51)
@@ -319,6 +365,12 @@ class Screen:
         curses.endwin()
 
     def _multi_player_lobby(self) -> bool:
+        """Window shown when player selects multiplayer mode and waits for other player to join
+
+        Returns:
+            bool: true, if another player is found and game is to be played
+        """
+
         game_on = False
         while True:
             box1 = self._screen.subwin(20, 80, 6, 50)

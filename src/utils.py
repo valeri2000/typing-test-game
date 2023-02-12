@@ -4,6 +4,15 @@ from constants import WORDS_PATH
 
 
 def generate_fixed_length_text(lim_words: int) -> list:
+    """Method which generates text from file with words with certain number of words
+
+    Args:
+        lim_words (int): wanted number of words in the generated text
+
+    Returns:
+        list: sequence of the words in the generated text
+    """
+
     dir_path = os.path.dirname(os.path.realpath(__file__))
     file_path = dir_path + WORDS_PATH
     with open(file_path, "r") as file:
@@ -14,6 +23,16 @@ def generate_fixed_length_text(lim_words: int) -> list:
 
 
 def text_with_fixed_column_size(text: list, lim_column: int) -> list:
+    """Method which makes each row of text with a maximum width size
+
+    Args:
+        text (list): sequence of words in the text
+        lim_column (int): maximum width (as number of symbols) for a row
+
+    Returns:
+        list: list of rows consisting the words which are limited to certain width
+    """
+
     res_text = []
     curr_column, curr_line = 0, ''
     for word in text:
@@ -30,6 +49,15 @@ def text_with_fixed_column_size(text: list, lim_column: int) -> list:
 
 
 def total_characters_in_text(text: list) -> int:
+    """Method which counts symbol in a sequence of words
+
+    Args:
+        text (list): sequence of the words in the text
+
+    Returns
+        int: total number of symbols
+    """
+
     res = 0
     for word in text:
         res += len(word)

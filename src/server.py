@@ -1,13 +1,19 @@
 import socket
 import pickle
-from time import sleep, time
+from time import sleep
 from threading import Thread, Lock
 from config import SERVER_PORT
 from utils import generate_fixed_length_text
 
 
 class Server:
+    """Class for the server responsible for managing multiplayer games
+    """
+
     def __init__(self):
+        """Constructor for Server class
+        """
+
         self._socket = socket.socket()
         self._socket.bind(('', SERVER_PORT))
         self._socket.listen()
@@ -16,7 +22,13 @@ class Server:
         self._clients = []
         self._results = []
 
-    def _client_manager(self, c):
+    def _client_manager(self, c: socket.socket):
+        """Method which is run in new threads for managing multiple clients
+
+        Args:
+            c (socket.socket): socket for single client
+        """
+
         accept = '1'
         with self._clients_lock:
             if len(self._clients) == 2:
@@ -72,6 +84,9 @@ class Server:
                     self._clients.clear()
 
     def start(self):
+        """Main public method which executes server logic
+        """
+
         while True:
             c, addr = self._socket.accept()
             print('Connected to: ' + addr[0] + ':' + str(addr[1]))
