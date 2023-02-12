@@ -1,10 +1,11 @@
 import os
 import random
+from constants import WORDS_PATH
 
 
 def generate_fixed_length_text(lim_words: int) -> list:
     dir_path = os.path.dirname(os.path.realpath(__file__))
-    file_path = dir_path + "/../data/english_top_1000.txt"
+    file_path = dir_path + WORDS_PATH
     with open(file_path, "r") as file:
         content = file.read()
         words = content.split(sep='\n')

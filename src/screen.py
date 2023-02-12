@@ -4,6 +4,7 @@ import time
 from client import Client
 from game import Game
 from utils import text_with_fixed_column_size, total_characters_in_text
+from constants import ESCAPE_ORD_CODE, BACKSPACE_ORD_CODE_1, BACKSPACE_ORD_CODE_2, ENTER_ORD_CODE
 
 
 class Screen:
@@ -41,12 +42,12 @@ class Screen:
             self._screen.refresh()
             time.sleep(0.01)
             char = self._screen.getch()
-            if char == 27:  # escape code
+            if char == ESCAPE_ORD_CODE:  # escape code
                 exit = True
                 break
-            elif (char == 8 or char == 127) and len(new_name) > 0:
+            elif (char in (BACKSPACE_ORD_CODE_1, BACKSPACE_ORD_CODE_2)) and len(new_name) > 0:
                 new_name = new_name[:-1]
-            elif char == 10 and len(new_name) > 0:
+            elif char == ENTER_ORD_CODE and len(new_name) > 0:
                 break
             elif (char >= ord('a') and char <= ord('z')) or (char >= ord('A') and char <= ord('Z')):
                 new_name += chr(char)
@@ -126,7 +127,7 @@ class Screen:
             self._screen.refresh()
             time.sleep(0.01)
             char = self._screen.getch()
-            if char == 27:  # escape code
+            if char == ESCAPE_ORD_CODE:  # escape code
                 break
 
         curses.endwin()
@@ -189,9 +190,9 @@ class Screen:
             self._screen.refresh()
             time.sleep(0.01)
             char = self._screen.getch()
-            if char == 27:  # escape code
+            if char == ESCAPE_ORD_CODE:  # escape code
                 break
-            elif char == 8 or char == 127:  # backspace
+            elif char in (BACKSPACE_ORD_CODE_1, BACKSPACE_ORD_CODE_2):  # backspace
                 if curr_pos_row == 0 and curr_pos_col == 0:
                     continue
                 if curr_pos_col == 0:
@@ -240,7 +241,7 @@ class Screen:
             self._screen.refresh()
             time.sleep(0.01)
             char = self._screen.getch()
-            if char == 27:  # escape code
+            if char == ESCAPE_ORD_CODE:  # escape code
                 break
 
         curses.endwin()
@@ -260,7 +261,7 @@ class Screen:
             self._screen.refresh()
             time.sleep(0.01)
             char = self._screen.getch()
-            if char == 27:  # escape code
+            if char == ESCAPE_ORD_CODE:  # escape code
                 break
             elif char == ord('1'):
                 self._game.update_text_length(10)
@@ -312,7 +313,7 @@ class Screen:
             self._screen.refresh()
             time.sleep(0.01)
             char = self._screen.getch()
-            if char == 27:  # escape code
+            if char == ESCAPE_ORD_CODE:  # escape code
                 break
 
         curses.endwin()
@@ -334,7 +335,7 @@ class Screen:
                 game_on = True
                 break
             char = self._screen.getch()
-            if char == 27:  # escape code
+            if char == ESCAPE_ORD_CODE:  # escape code
                 break
 
         curses.endwin()
