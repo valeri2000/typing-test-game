@@ -20,7 +20,7 @@ This is a typing test game written in Python with multiplayer support (maximum o
     λ pip install -r requirements-linux.txt
     ```
 
-    2.2. For Windows (curses package is windows-curses, **not tested**)
+    2.2. For Windows (curses package is windows-curses, **partially tested**)
     ```
     λ pip install -r requirements-windows.txt
     ```
