@@ -25,12 +25,18 @@ This is a typing test game written in Python with multiplayer support (maximum o
     λ pip install -r requirements-windows.txt
     ```
 
-3. To start
+3. To start:
 
     3.1. Configure server address and port for multiplayer functionality in src/config.py (default is **localhost:12346**)
 
-    3.2. Execute following commands
+    3.2. Execute following commands:
     ```
     λ python src/server.py # single instance needed for server for multiplayer
     λ python src/main.py   # instance for the client/game, in another terminal
     ```
+    
+    3.3. To execute tests:
+    ```
+    λ python src/utils_test.py
+    ```
+    
