@@ -113,6 +113,7 @@ class Screen:
                     box2.addstr('You won!\n')
                 else:
                     box2.addstr('You lost!\n')
+            box2.addstr('\n\nIn order to go back, press ESC')
             self._screen.refresh()
             time.sleep(0.01)
             char = self._screen.getch()

@@ -12,7 +12,7 @@ class Client:
             self._socket.connect((SERVER_ADDRESS, SERVER_PORT))
             res = self._socket.recv(1).decode()
         except:
-            res = False
+            res = '0'
         if res == '1':
             self.send_msg(player_name)
         return res == '1'
