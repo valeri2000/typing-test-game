@@ -81,6 +81,8 @@ class Screen:
 
         player_name = self._game.player.name()
         while True:
+            if len(player_name) == 0:
+                break
             box1 = self._screen.subwin(CURSES_BOX_LINES + 2, CURSES_BOX_COLS + 2,
                                        CURSES_BOX_BEGIN_Y - 1, CURSES_BOX_BEGIN_X - 1)
             box2 = self._screen.subwin(CURSES_BOX_LINES, CURSES_BOX_COLS,
@@ -110,7 +112,7 @@ class Screen:
                 self._settings_window()
             if char == ord('c'):
                 self._game.player.clear_player_stats()
-                exit(0)
+                break
             if char == ord('e'):
                 break
 
@@ -408,7 +410,8 @@ class Screen:
             box1.box()
             box2.clear()
             box2.addstr(
-                'Waiting for another player to join.')
+                'Waiting for another player to join.\n')
+            box2.addstr('Press ESC to go back.\n')
             self._screen.refresh()
             time.sleep(1)
             txt = self._client.receive_text()
