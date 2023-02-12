@@ -145,11 +145,10 @@ class Screen:
             box2.clear()
             box2.addstr('Text finished in ' +
                         str(time_taken_secs) + ' seconds!\n')
-            box2.addstr('WPM: ' + "{:.2f}".format(wpm) + '\n')
+            box2.addstr(f'WPM: {wpm:.2f}\n')
             box2.addstr('Mistakes: ' + str(mistakes) + '\n')
-            box2.addstr(
-                'Accuracy: ' + "{:.2f}".format(
-                    (num_symbols - mistakes) / num_symbols * 100) + '%\n')
+            accuracy = (num_symbols - mistakes) / num_symbols * 100
+            box2.addstr(f'Accuracy: {accuracy:.2f}%\n')
             if is_multi:
                 if multi_result == -1:
                     box2.addstr('Waiting for the other player to finish ..\n')
@@ -292,8 +291,8 @@ class Screen:
             box1.box()
             box2.clear()
             box2.addstr('Player name: ' + self._game.player.name() + '\n')
-            box2.addstr('Average WPM: ' +
-                        "{:.2f}".format(self._game.player.average_wpm()) + '\n')
+            avg_wpm = self._game.player.average_wpm()
+            box2.addstr(f'Average WPM: {avg_wpm:.2f}\n')
             box2.addstr('Total texts completed: ' +
                         str(self._game.player.total_number_of_races()) + '\n')
             box2.addstr('Last ten results: ' +
