@@ -61,7 +61,4 @@ def total_characters_in_text(text: list) -> int:
         int: total number of symbols
     """
 
-    res = 0
-    for word in text:
-        res += len(word)
-    return res
+    return sum(len(word) for word in text)
