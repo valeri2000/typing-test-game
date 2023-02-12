@@ -197,7 +197,8 @@ class Screen:
             is_multi (bool): is current game multiplayer one
         """
 
-        transformed_text = text_with_fixed_column_size(self._game.text(), 76)
+        transformed_text = text_with_fixed_column_size(self._game.text(),
+                                                       CURSES_BOX_COLS - 2)
         track_time, start_time, end_time = False, 0, 0
         if is_multi:
             track_time = True
