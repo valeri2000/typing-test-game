@@ -8,6 +8,7 @@ from client import Client
 from game import Game
 from utils import text_with_fixed_column_size, total_characters_in_text
 from constants import ESCAPE_ORD_CODE, BACKSPACE_ORD_CODE_1, BACKSPACE_ORD_CODE_2, ENTER_ORD_CODE
+from constants import CURSES_BOX_LINES, CURSES_BOX_COLS, CURSES_BOX_BEGIN_Y, CURSES_BOX_BEGIN_X
 
 
 class Screen:
@@ -26,7 +27,7 @@ class Screen:
         curses.start_color()
         curses.init_pair(1, curses.COLOR_GREEN, curses.COLOR_BLACK)
         curses.init_pair(2, curses.COLOR_RED, curses.COLOR_BLACK)
-        self._screen.border(0)
+        # self._screen.border(0)
         self._screen.nodelay(True)
         curses.curs_set(False)
 
@@ -48,8 +49,10 @@ class Screen:
         new_name = ''
         should_exit = False
         while True:
-            box1 = self._screen.subwin(20, 80, 6, 50)
-            box2 = self._screen.subwin(18, 78, 7, 51)
+            box1 = self._screen.subwin(CURSES_BOX_LINES + 2, CURSES_BOX_COLS + 2,
+                                       CURSES_BOX_BEGIN_Y - 1, CURSES_BOX_BEGIN_X - 1)
+            box2 = self._screen.subwin(CURSES_BOX_LINES, CURSES_BOX_COLS,
+                                       CURSES_BOX_BEGIN_Y, CURSES_BOX_BEGIN_X)
             box1.box()
             box2.clear()
             box2.addstr('This looks like first time launch.\n')
@@ -78,17 +81,20 @@ class Screen:
 
         player_name = self._game.player.name()
         while True:
-            box1 = self._screen.subwin(20, 80, 6, 50)
-            box2 = self._screen.subwin(18, 78, 7, 51)
+            box1 = self._screen.subwin(CURSES_BOX_LINES + 2, CURSES_BOX_COLS + 2,
+                                       CURSES_BOX_BEGIN_Y - 1, CURSES_BOX_BEGIN_X - 1)
+            box2 = self._screen.subwin(CURSES_BOX_LINES, CURSES_BOX_COLS,
+                                       CURSES_BOX_BEGIN_Y, CURSES_BOX_BEGIN_X)
             box1.box()
+            box2.clear()
             box2.addstr('Hello, ' + str(player_name) + '!\n\n')
-            box2.addstr('New singleplayer game (press s)\n')
-            box2.addstr('New multiplayer game (press m)\n')
-            box2.addstr('Show statistics (press t)\n')
-            box2.addstr('Settings (press o)\n')
-            box2.addstr('Clear ALL player info (press c)\n')
-            box2.addstr('Exit (press e)\n')
-            box2.addstr('\n\nIn order to go back from a menu, press ESC')
+            box2.addstr('> New singleplayer game (press s)\n')
+            box2.addstr('> New multiplayer game (press m)\n')
+            box2.addstr('> Show statistics (press t)\n')
+            box2.addstr('> Settings (press o)\n')
+            box2.addstr('> Clear ALL player info (press c)\n')
+            box2.addstr('> Exit (press e)\n')
+            box2.addstr('\nIn order to go back from a menu, press ESC')
             self._screen.refresh()
             time.sleep(0.01)
             char = self._screen.getch()
@@ -104,7 +110,7 @@ class Screen:
                 self._settings_window()
             if char == ord('c'):
                 self._game.player.clear_player_stats()
-                break
+                exit(0)
             if char == ord('e'):
                 break
 
@@ -129,8 +135,10 @@ class Screen:
         self._game.player.save_player_stats()
         multi_result, opponent_wpm = -1, 0
         while True:
-            box1 = self._screen.subwin(20, 80, 6, 50)
-            box2 = self._screen.subwin(18, 78, 7, 51)
+            box1 = self._screen.subwin(CURSES_BOX_LINES + 2, CURSES_BOX_COLS + 2,
+                                       CURSES_BOX_BEGIN_Y - 1, CURSES_BOX_BEGIN_X - 1)
+            box2 = self._screen.subwin(CURSES_BOX_LINES, CURSES_BOX_COLS,
+                                       CURSES_BOX_BEGIN_Y, CURSES_BOX_BEGIN_X)
             box1.box()
             box2.clear()
             box2.addstr('Text finished in ' +
@@ -198,8 +206,10 @@ class Screen:
         last_char_wrong = False
         mistakes = 0
         while True:
-            box1 = self._screen.subwin(20, 80, 6, 50)
-            box2 = self._screen.subwin(18, 78, 7, 51)
+            box1 = self._screen.subwin(CURSES_BOX_LINES + 2, CURSES_BOX_COLS + 2,
+                                       CURSES_BOX_BEGIN_Y - 1, CURSES_BOX_BEGIN_X - 1)
+            box2 = self._screen.subwin(CURSES_BOX_LINES, CURSES_BOX_COLS,
+                                       CURSES_BOX_BEGIN_Y, CURSES_BOX_BEGIN_X)
             box1.box()
             if curr_pos_row == 0 and curr_pos_col == 0:
                 box2.clear()
@@ -272,8 +282,10 @@ class Screen:
         """
 
         while True:
-            box1 = self._screen.subwin(20, 80, 6, 50)
-            box2 = self._screen.subwin(18, 78, 7, 51)
+            box1 = self._screen.subwin(CURSES_BOX_LINES + 2, CURSES_BOX_COLS + 2,
+                                       CURSES_BOX_BEGIN_Y - 1, CURSES_BOX_BEGIN_X - 1)
+            box2 = self._screen.subwin(CURSES_BOX_LINES, CURSES_BOX_COLS,
+                                       CURSES_BOX_BEGIN_Y, CURSES_BOX_BEGIN_X)
             box1.box()
             box2.clear()
             box2.addstr('Player name: ' + self._game.player.name() + '\n')
@@ -297,15 +309,17 @@ class Screen:
         """
 
         while True:
-            box1 = self._screen.subwin(20, 80, 6, 50)
-            box2 = self._screen.subwin(18, 78, 7, 51)
+            box1 = self._screen.subwin(CURSES_BOX_LINES + 2, CURSES_BOX_COLS + 2,
+                                       CURSES_BOX_BEGIN_Y - 1, CURSES_BOX_BEGIN_X - 1)
+            box2 = self._screen.subwin(CURSES_BOX_LINES, CURSES_BOX_COLS,
+                                       CURSES_BOX_BEGIN_Y, CURSES_BOX_BEGIN_X)
             box1.box()
             box2.clear()
             box2.addstr('Update the number of words in a text:\n')
-            box2.addstr('\t10 (press 1)\n')
-            box2.addstr('\t30 (press 2)\n')
-            box2.addstr('\t60 (press 3)\n')
-            box2.addstr('\t100 (press 4)\n')
+            box2.addstr('\t> 10 (press 1)\n')
+            box2.addstr('\t> 30 (press 2)\n')
+            box2.addstr('\t> 60 (press 3)\n')
+            box2.addstr('\t> 100 (press 4)\n')
             box2.addstr('\n\nIn order to go back, press ESC')
             self._screen.refresh()
             time.sleep(0.01)
@@ -336,8 +350,10 @@ class Screen:
         init = False
         opponent_name = ''
         while True:
-            box1 = self._screen.subwin(20, 80, 6, 50)
-            box2 = self._screen.subwin(18, 78, 7, 51)
+            box1 = self._screen.subwin(CURSES_BOX_LINES + 2, CURSES_BOX_COLS + 2,
+                                       CURSES_BOX_BEGIN_Y - 1, CURSES_BOX_BEGIN_X - 1)
+            box2 = self._screen.subwin(CURSES_BOX_LINES, CURSES_BOX_COLS,
+                                       CURSES_BOX_BEGIN_Y, CURSES_BOX_BEGIN_X)
             box1.box()
             box2.clear()
             box2.addstr('Race will begin in ' +
@@ -359,12 +375,14 @@ class Screen:
         """
 
         while True:
-            box1 = self._screen.subwin(20, 80, 6, 50)
-            box2 = self._screen.subwin(18, 78, 7, 51)
+            box1 = self._screen.subwin(CURSES_BOX_LINES + 2, CURSES_BOX_COLS + 2,
+                                       CURSES_BOX_BEGIN_Y - 1, CURSES_BOX_BEGIN_X - 1)
+            box2 = self._screen.subwin(CURSES_BOX_LINES, CURSES_BOX_COLS,
+                                       CURSES_BOX_BEGIN_Y, CURSES_BOX_BEGIN_X)
             box1.box()
             box2.clear()
             box2.addstr(
-                'There is currently an active game or server is unavailable. Please try again later.')
+                'There is currently an active game or server is unavailable.\nPlease try again later.\n')
             self._screen.refresh()
             time.sleep(0.01)
             char = self._screen.getch()
@@ -382,8 +400,10 @@ class Screen:
 
         game_on = False
         while True:
-            box1 = self._screen.subwin(20, 80, 6, 50)
-            box2 = self._screen.subwin(18, 78, 7, 51)
+            box1 = self._screen.subwin(CURSES_BOX_LINES + 2, CURSES_BOX_COLS + 2,
+                                       CURSES_BOX_BEGIN_Y - 1, CURSES_BOX_BEGIN_X - 1)
+            box2 = self._screen.subwin(CURSES_BOX_LINES, CURSES_BOX_COLS,
+                                       CURSES_BOX_BEGIN_Y, CURSES_BOX_BEGIN_X)
             box1.box()
             box2.clear()
             box2.addstr(
