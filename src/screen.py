@@ -90,10 +90,11 @@ class Screen:
 
         curses.endwin()
 
-    def _game_end_window(self, time_taken_secs: int, mistakes: int, num_words: int, num_symbols: int):
+    def _game_end_window(self, time_taken_secs: int, mistakes: int, num_words: int, num_symbols: int, is_multi: bool):
         wpm = num_words / time_taken_secs * 60
         self._game.player.add_result(int(wpm))
         self._game.player.save_player_stats()
+        multi_result = -1
         while True:
             box1 = self._screen.subwin(20, 80, 6, 50)
             box2 = self._screen.subwin(18, 78, 7, 51)
@@ -105,6 +106,13 @@ class Screen:
             box2.addstr('Mistakes: ' + str(mistakes) + '\n')
             box2.addstr(
                 'Accuracy: ' + "{:.2f}".format((num_symbols - mistakes) / num_symbols * 100) + '%\n')
+            if is_multi:
+                if multi_result == -1:
+                    multi_result = int(self._client.receive_msg())
+                if multi_result == 1:
+                    box2.addstr('You won!\n')
+                else:
+                    box2.addstr('You lost!\n')
             self._screen.refresh()
             time.sleep(0.01)
             char = self._screen.getch()
@@ -117,12 +125,17 @@ class Screen:
 
     def _multi_player_window(self):
         self._client = Client()
-        if self._client.join_lobby():
-            txt = self._client.receive_text()
-            self._game.set_text(txt)
+        if self._client.join_lobby(self._game.player.name()):
+            if not self._multi_player_lobby():
+                self._client._socket.close()
+                self._start_window()
+                return
             self._multi_player_countdown()
             if self._client.receive_msg() == 'start':
                 self._game_window(1)
+        else:
+            self._multi_player_wait()
+            self._start_window()
 
     def _game_window(self, is_multi: bool):
         transformed_text = text_with_fixed_column_size(self._game.text(), 76)
@@ -193,16 +206,14 @@ class Screen:
                 if curr_pos_row == len(transformed_text) and not last_char_wrong:
                     end_time = int(time.time())
                     if is_multi:
-                        self._client.send_msg(str(time.time()))
-                        break
+                        self._client.send_msg(str(end_time))
                     self._game_end_window(end_time - start_time, mistakes, len(
-                        self._game.text()), total_characters_in_text(transformed_text))
+                        self._game.text()), total_characters_in_text(transformed_text), is_multi)
                     break
 
         curses.endwin()
         self._game.new_text()
-        if not is_multi:
-            self._start_window()
+        self._start_window()
 
     def _stats_window(self):
         while True:
@@ -261,15 +272,62 @@ class Screen:
 
     def _multi_player_countdown(self):
         time_left = 10
+        init = False
+        opponent_name = ''
         while True:
             box1 = self._screen.subwin(20, 80, 6, 50)
             box2 = self._screen.subwin(18, 78, 7, 51)
             box1.box()
             box2.clear()
-            box2.addstr('Race will begin in ' + str(time_left) + ' seconds!')
+            box2.addstr('Race will begin in ' +
+                        str(time_left) + ' seconds!\n')
+            if len(opponent_name):
+                box2.addstr('Opponent is ' + opponent_name + '\n')
             self._screen.refresh()
             time.sleep(1)
+            if not init:
+                opponent_name = self._client.receive_msg()
+                init = True
             time_left -= 1
             if time_left == 0:
                 break
         curses.endwin()
+
+    def _multi_player_wait(self):
+        while True:
+            box1 = self._screen.subwin(20, 80, 6, 50)
+            box2 = self._screen.subwin(18, 78, 7, 51)
+            box1.box()
+            box2.clear()
+            box2.addstr(
+                'There is currently an active game or server is unavailable. Please try again later.')
+            self._screen.refresh()
+            time.sleep(0.01)
+            char = self._screen.getch()
+            if char == 27:  # escape code
+                break
+
+        curses.endwin()
+
+    def _multi_player_lobby(self) -> bool:
+        game_on = False
+        while True:
+            box1 = self._screen.subwin(20, 80, 6, 50)
+            box2 = self._screen.subwin(18, 78, 7, 51)
+            box1.box()
+            box2.clear()
+            box2.addstr(
+                'Waiting for another player to join.')
+            self._screen.refresh()
+            time.sleep(1)
+            txt = self._client.receive_text()
+            if len(txt) != 0:
+                self._game.set_text(txt)
+                game_on = True
+                break
+            char = self._screen.getch()
+            if char == 27:  # escape code
+                break
+
+        curses.endwin()
+        return game_on

@@ -12,37 +12,68 @@ class Server:
         self._socket.bind(('', SERVER_PORT))
         self._socket.listen()
         self._data_lock = Lock()
+        self._data_lock2 = Lock()
         self._clients = []
+        self._results = []
 
     def _multi_threaded_client(self, c):
         accept = True
         with self._data_lock:
             if len(self._clients) == 2:
                 accept = False
-            else:
-                self._clients.append(c)
         c.send(str(int(accept)).encode())
         if not accept:
             c.close()
-        else:
-            if len(self._clients) == 2:
-                txt = generate_fixed_length_text(10)
-                data = pickle.dumps(txt)
-                for c in self._clients:
+            return
+        player_name = c.recv(1024).decode()
+        self._clients.append((c, player_name))
+        if len(self._clients) == 2:
+            txt = generate_fixed_length_text(30)
+            data = pickle.dumps(txt)
+            with self._data_lock:
+                for (c, _) in self._clients:
                     c.send(data)
-                sleep(10)
-                with self._data_lock:
-                    for c in self._clients:
-                        c.send(b'start')
-            while True:
-                msg = c.recv(1024).decode()  # this BLOCKS
-                if not msg:
-                    print('Client dead!')
+            sleep(2)
+            with self._data_lock:
+                for (c, name) in self._clients:
+                    if name != self._clients[0][1]:
+                        c.send(self._clients[0][1].encode())
+                    else:
+                        c.send(self._clients[1][1].encode())
+            sleep(2)
+            with self._data_lock:
+                for (c, _) in self._clients:
+                    c.send(b'start')
+        msg = c.recv(1024).decode()  # this BLOCKS
+        if not msg:
+            print('Client dead!')
+            with self._data_lock:
+                self._clients.remove((c, player_name))
+        else:
+            print('Got from client ' + str(msg))
+            with self._data_lock2:
+                self._results.append((player_name, msg))
+        with self._data_lock2:
+            if len(self._results) == 2:
+                if float(self._results[0][1]) > float(self._results[1][1]):
                     with self._data_lock:
-                        self._clients.remove(c)
-                    break
+                        if self._clients[0][1] == self._results[0][0]:
+                            self._clients[0][0].send(b'0')
+                            self._clients[1][0].send(b'1')
+                        else:
+                            self._clients[0][0].send(b'1')
+                            self._clients[1][0].send(b'0')
                 else:
-                    print('Got from client ' + str(msg))
+                    with self._data_lock:
+                        if self._clients[0][1] == self._results[0][0]:
+                            self._clients[0][0].send(b'1')
+                            self._clients[1][0].send(b'0')
+                        else:
+                            self._clients[0][0].send(b'0')
+                            self._clients[1][0].send(b'1')
+                self._results.clear()
+                with self._data_lock:
+                    self._clients.clear()
 
     def start(self):
         while True:
@@ -52,5 +83,5 @@ class Server:
             t.start()
 
 
-hey = Server()
-hey.start()
+server = Server()
+server.start()
