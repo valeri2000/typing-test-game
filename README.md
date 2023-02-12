@@ -1,6 +1,6 @@
 # Typing test game
 
-This is a typing test game written in Python with multiplayer support.
+This is a typing test game written in Python with multiplayer support (maximum of 1 game at a time consisting of 2 players)
 
 ## Install instructions
 
