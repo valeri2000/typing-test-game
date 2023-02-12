@@ -4,6 +4,7 @@
 import curses
 import curses.panel
 import time
+import os
 from client import Client
 from game import Game
 from utils import text_with_fixed_column_size, total_characters_in_text
@@ -49,6 +50,8 @@ class Screen:
         new_name = ''
         should_exit = False
         while True:
+            if os.name != 'posix':
+                self._screen.clear()
             box1 = self._screen.subwin(CURSES_BOX_LINES + 2, CURSES_BOX_COLS + 2,
                                        CURSES_BOX_BEGIN_Y - 1, CURSES_BOX_BEGIN_X - 1)
             box2 = self._screen.subwin(CURSES_BOX_LINES, CURSES_BOX_COLS,
@@ -81,6 +84,8 @@ class Screen:
 
         player_name = self._game.player.name()
         while True:
+            if os.name != 'posix':
+                self._screen.clear()
             if len(player_name) == 0:
                 break
             box1 = self._screen.subwin(CURSES_BOX_LINES + 2, CURSES_BOX_COLS + 2,
@@ -137,6 +142,8 @@ class Screen:
         self._game.player.save_player_stats()
         multi_result, opponent_wpm = -1, 0
         while True:
+            if os.name != 'posix':
+                self._screen.clear()
             box1 = self._screen.subwin(CURSES_BOX_LINES + 2, CURSES_BOX_COLS + 2,
                                        CURSES_BOX_BEGIN_Y - 1, CURSES_BOX_BEGIN_X - 1)
             box2 = self._screen.subwin(CURSES_BOX_LINES, CURSES_BOX_COLS,
@@ -208,6 +215,8 @@ class Screen:
         last_char_wrong = False
         mistakes = 0
         while True:
+            if os.name != 'posix':
+                self._screen.clear()
             box1 = self._screen.subwin(CURSES_BOX_LINES + 2, CURSES_BOX_COLS + 2,
                                        CURSES_BOX_BEGIN_Y - 1, CURSES_BOX_BEGIN_X - 1)
             box2 = self._screen.subwin(CURSES_BOX_LINES, CURSES_BOX_COLS,
@@ -284,6 +293,8 @@ class Screen:
         """
 
         while True:
+            if os.name != 'posix':
+                self._screen.clear()
             box1 = self._screen.subwin(CURSES_BOX_LINES + 2, CURSES_BOX_COLS + 2,
                                        CURSES_BOX_BEGIN_Y - 1, CURSES_BOX_BEGIN_X - 1)
             box2 = self._screen.subwin(CURSES_BOX_LINES, CURSES_BOX_COLS,
@@ -311,6 +322,8 @@ class Screen:
         """
 
         while True:
+            if os.name != 'posix':
+                self._screen.clear()
             box1 = self._screen.subwin(CURSES_BOX_LINES + 2, CURSES_BOX_COLS + 2,
                                        CURSES_BOX_BEGIN_Y - 1, CURSES_BOX_BEGIN_X - 1)
             box2 = self._screen.subwin(CURSES_BOX_LINES, CURSES_BOX_COLS,
@@ -352,6 +365,8 @@ class Screen:
         init = False
         opponent_name = ''
         while True:
+            if os.name != 'posix':
+                self._screen.clear()
             box1 = self._screen.subwin(CURSES_BOX_LINES + 2, CURSES_BOX_COLS + 2,
                                        CURSES_BOX_BEGIN_Y - 1, CURSES_BOX_BEGIN_X - 1)
             box2 = self._screen.subwin(CURSES_BOX_LINES, CURSES_BOX_COLS,
@@ -377,6 +392,8 @@ class Screen:
         """
 
         while True:
+            if os.name != 'posix':
+                self._screen.clear()
             box1 = self._screen.subwin(CURSES_BOX_LINES + 2, CURSES_BOX_COLS + 2,
                                        CURSES_BOX_BEGIN_Y - 1, CURSES_BOX_BEGIN_X - 1)
             box2 = self._screen.subwin(CURSES_BOX_LINES, CURSES_BOX_COLS,
@@ -402,6 +419,8 @@ class Screen:
 
         game_on = False
         while True:
+            if os.name != 'posix':
+                self._screen.clear()
             box1 = self._screen.subwin(CURSES_BOX_LINES + 2, CURSES_BOX_COLS + 2,
                                        CURSES_BOX_BEGIN_Y - 1, CURSES_BOX_BEGIN_X - 1)
             box2 = self._screen.subwin(CURSES_BOX_LINES, CURSES_BOX_COLS,

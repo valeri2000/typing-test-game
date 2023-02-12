@@ -43,12 +43,14 @@ class Client:
         """
 
         txt = []
+        self._socket.setblocking(False)
         try:
-            received_data = self._socket.recv(1024, socket.MSG_DONTWAIT)
+            received_data = self._socket.recv(1024)
             if received_data:
                 txt = pickle.loads(received_data)
         except:
             pass
+        self._socket.setblocking(True)
         return txt
 
     def receive_msg(self) -> str:
@@ -69,11 +71,13 @@ class Client:
         """
 
         received_data = ''
+        self._socket.setblocking(False)
         try:
             received_data = self._socket.recv(
-                1024, socket.MSG_DONTWAIT).decode()
+                1024).decode()
         except:
             pass
+        self._socket.setblocking(True)
         return str(received_data)
 
     def send_msg(self, msg: str) -> bool:

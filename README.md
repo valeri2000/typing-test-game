@@ -8,8 +8,8 @@ This is a typing test game written in Python with multiplayer support (maximum o
 
 ```
 λ mkdir venv
-λ python3 -m venv venv
-λ source venv/bin/activate
+λ python -m venv venv
+λ source venv/bin/activate (venv\Scripts\activate.bat for Windows)
 λ pip install --upgrade pip
 ```
 
@@ -31,12 +31,12 @@ This is a typing test game written in Python with multiplayer support (maximum o
 
     3.2. Execute following commands:
     ```
-    λ python src/server.py # single instance needed for server for multiplayer
-    λ python src/main.py   # instance for the client/game, in another terminal
+    λ python src/server.py (src\server.py for Windows) # single instance needed for server for multiplayer
+    λ python src/main.py (src\main.py for Windows)     # instance for the client/game, in another terminal
     ```
     
     3.3. To execute tests:
     ```
-    λ python src/utils_test.py
+    λ python src/utils_test.py (src\utils_test.py for Windows)
     ```
     
